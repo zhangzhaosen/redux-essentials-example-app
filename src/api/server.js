@@ -131,10 +131,13 @@ const serializePost = (post) => ({
 
 export const handlers = [
   rest.get('/fakeApi/posts', function (req, res, ctx) {
+      //debugger;
     const posts = db.post.getAll().map(serializePost)
     return res(ctx.delay(ARTIFICIAL_DELAY_MS), ctx.json(posts))
   }),
   rest.post('/fakeApi/posts', function (req, res, ctx) {
+
+    //debugger;
     const data = req.body
 
     if (data.content === 'error') {
@@ -221,7 +224,7 @@ export const handlers = [
 ]
 
 export const worker = setupWorker(...handlers)
-// worker.printHandlers() // Optional: nice for debugging to see all available route handlers that will be intercepted
+ worker.printHandlers() // Optional: nice for debugging to see all available route handlers that will be intercepted
 
 /* Mock Websocket Setup */
 
