@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import { PostAuthor } from './PostAuthor'
-import { selectAllPosts } from './postsSlice'
+import { selectAllPosts, selectPostById, selectPostIds } from './postsSlice'
 import { ReactionButtons } from './ReactionButtons'
 import { TimeAgo } from './TimeAgo'
 import { fetchPosts } from './postsSlice'
@@ -14,7 +14,9 @@ export const PostList = () => {
 
     const dispatch = useDispatch();
 
-    const posts = useSelector(selectAllPosts)
+    //const posts = useSelector(selectAllPosts)
+    //debugger;
+    const orderedPostIds = useSelector(selectPostIds)
 
     const postStatus = useSelector(state => state.posts.status)
 
@@ -27,7 +29,8 @@ export const PostList = () => {
 
     }, [postStatus])
 
-    let PostExcerpt = ({ post }) => {
+    let PostExcerpt = ({ postId }) => {
+        const post = useSelector(state => selectPostById(state, postId))
         return (<article className="post-excerpt" key={post.id}>
             <h3>{post.title}</h3>
             <div>
@@ -40,16 +43,20 @@ export const PostList = () => {
         </article>)
     }
 
-    PostExcerpt = React.memo(PostExcerpt)  
-   
+    PostExcerpt = React.memo(PostExcerpt)
+
 
     let content
     if (postStatus === 'loading') {
         content = <Spinner text="Loading..." />
     }
     else if (postStatus === 'succeeded') {    // Sort posts in reverse chronological order by datetime string    
-        const orderedPosts = posts.slice().sort((a, b) => b.date.localeCompare(a.date))
-        content = orderedPosts.map(post => (<PostExcerpt key={post.id} post={post} />))
+        // const orderedPosts = posts.slice().sort((a, b) => b.date.localeCompare(a.date))
+        // content = orderedPosts.map(post => (<PostExcerpt key={post.id} post={post} />))
+
+        content = orderedPostIds.map(postId => (
+            <PostExcerpt key={postId} postId={postId} />
+        ))
     } else if (postStatus === 'failed') {
         content = <div>{error}</div>
     }

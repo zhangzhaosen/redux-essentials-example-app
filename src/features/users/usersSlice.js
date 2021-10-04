@@ -1,14 +1,17 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice, createEntityAdapter } from '@reduxjs/toolkit'
 import { client } from '../../api/client'
 
 import { createSelector } from 'reselect'
 import { selectAllPosts } from '../posts/postsSlice'
 
-const initialState = [
-    { id: '0', name: 'Tianna Jenkins' },
-    { id: '1', name: 'Kevin Grant' },
-    { id: '2', name: 'Madison Price' }
-]
+const usersAdapter = createEntityAdapter()
+const initialState = usersAdapter.getInitialState()
+
+// const initialState = [
+//     { id: '0', name: 'Tianna Jenkins' },
+//     { id: '1', name: 'Kevin Grant' },
+//     { id: '2', name: 'Madison Price' }
+// ]
 
 export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
     const response = await client.get('/fakeApi/users')
@@ -21,18 +24,23 @@ const usersSlice = createSlice({
     reducers: {},
     extraReducers(builder) {
         builder.addCase(fetchUsers.fulfilled, (state, action) => {
-            return action.payload
-            // debugger;
-            // state = action.payload;
+            //return action.payload
+            usersAdapter.setAll(state, action)
 
         })
     }
 })
 
-export const selectAllUsers = state => state.users
+// export const selectAllUsers = state => state.users
 
-export const selectUserById = (state, userId) =>
-    state.users.find(user => user.id === userId)
+// export const selectUserById = (state, userId) =>
+//     state.users.find(user => user.id === userId)
+
+
+export const { 
+    selectAll: selectAllUsers, 
+    selectById: selectUserById 
+} =  usersAdapter.getSelectors(state => state.users)
 
 
 export const selectPostsByUser = createSelector(
