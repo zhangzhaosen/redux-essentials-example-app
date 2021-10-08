@@ -3,6 +3,7 @@ import React, { useState } from "react";
 
 
 import { useDispatch, useSelector } from "react-redux";
+import { useAddNewPostMutation } from "../api/apiSlice";
 import { selectAllUsers } from "../users/usersSlice";
 
 
@@ -13,9 +14,11 @@ export const AddPostForm = () => {
     const [content, setContent] = useState('')
     const [userId, setUserId] = useState('')
 
-    const [addRequestStatus, setAddRequestStatus] = useState('idle')
+   // const [addRequestStatus, setAddRequestStatus] = useState('idle')
 
     //const users = useSelector(state => state.users)
+    const [addNewPost, { isLoading }] = useAddNewPostMutation()
+
     const users =useSelector(selectAllUsers)
     const onTitleChanged = e => setTitle(e.target.value);
     const onContentChanged = e => setContent(e.target.value);
@@ -24,24 +27,26 @@ export const AddPostForm = () => {
 
     const dispatch = useDispatch();
 
-    const canSave = [title, content, userId].every(Boolean) && addRequestStatus === 'idle'
+    //const canSave = [title, content, userId].every(Boolean) && addRequestStatus === 'idle'
+    const canSave = [title, content, userId].every(Boolean) &&  !isLoading
 
     const onSavePostClicked = async () => {
         if (canSave) {
 
             try {
-                setAddRequestStatus('pending')
-                var post = { title, content, user: userId }
-                await dispatch(
-                    // postAdded(
+                // setAddRequestStatus('pending')
+                // var post = { title, content, user: userId }
+                // await dispatch(
+                //     // postAdded(
 
-                    //     title, 
-                    //     content, 
-                    //     userId, 
+                //     //     title, 
+                //     //     content, 
+                //     //     userId, 
 
-                    // )
-                    addNewPost(post)
-                ).unwrap()
+                //     // )
+                //     addNewPost(post)
+                // ).unwrap()
+                await addNewPost({ title, content, user: userId }).unwrap()
 
                 setTitle('')
                 setContent('')
@@ -50,7 +55,7 @@ export const AddPostForm = () => {
                 
                 console.error('failed to save post: ' ,  err)
             } finally {
-                setAddRequestStatus('idle')
+               // setAddRequestStatus('idle')
             }
         }
     }
